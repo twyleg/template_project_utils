@@ -92,6 +92,8 @@ def scan_for_keywords(base_dir_path: Path, keywords: list) -> Tuple[int, int]:
     for path in base_dir_path.rglob("*"):
         if path.is_relative_to(base_dir_path / ".git/"):
             pass  # Ignore
+        elif path.is_relative_to(base_dir_path / "venv/"):
+            pass  # Ignore
         elif path.is_dir():
             for keyword in keywords:
                 if keyword in str(path.relative_to(base_dir_path)):
