@@ -1,13 +1,12 @@
+placeholder: placeholder_string
+
 update_files:
-  - file/path/0:
-    - "stringA": "stringB"
-    - "stringC": "stringB"
-  - file/path/1:
-    - "stringA": "stringB"
+  - file/path/0
+  - file/path/1
 
 rename_files:
-  - file/path/2: file/path/3
-  - file/path/4: file/path/5
+  - file/path/2.test
+  - file/path/4.foo
 
 remove_files:
   - file/to/remove/A

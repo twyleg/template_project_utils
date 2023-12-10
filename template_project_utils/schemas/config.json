@@ -1,36 +1,28 @@
 {
   "type": ["object", "null"],
   "properties": {
+    "placeholder": {
+      "type": "string",
+      "additionalProperties": false
+    },
     "update_files": {
       "type": ["array", "null"],
       "items": {
-        "type": "object",
-        "patternProperties": {
-          ".+": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "patternProperties": {
-                ".+": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            }
-          }
-        },
+        "type": "string",
         "additionalProperties": false
       }
     },
     "rename_files": {
       "type": ["array", "null"],
       "items": {
-        "type": "object",
-        "patternProperties": {
-          ".+": {
-            "type": "string"
-          }
-        },
+        "type": "string",
+        "additionalProperties": false
+      }
+    },
+    "rename_dirs": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string",
         "additionalProperties": false
       }
     },

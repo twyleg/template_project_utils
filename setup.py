@@ -18,7 +18,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     author="Torsten Wylegala",
     author_email="mail@twyleg.de",
-    description=(""),
+    description="Utilities to initialize template projects (replacing names, renaming/removing files.",
     license="GPL 3.0",
     keywords="",
     url="https://github.com/twyleg/template_project_utils",

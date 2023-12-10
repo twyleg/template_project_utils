@@ -2,7 +2,6 @@
 import sys
 import argparse
 import logging
-import yaml
 
 from pathlib import Path
 from template_project_utils import __version__
@@ -16,6 +15,7 @@ FILE_DIR = Path(__file__).parent
 def main() -> None:
 
     logging.basicConfig(stream=sys.stdout, format=FORMAT, level=logging.INFO)
+    logging.info("template_project_utils started!")
 
     parser = argparse.ArgumentParser(usage="template_project_utils <command> [<args>] <files>")
     parser.add_argument(
@@ -25,8 +25,31 @@ def main() -> None:
         action="version",
         version=__version__,
     )
-    args = parser.parse_args(sys.argv[1:2])
 
+    parser.add_argument(
+        "target_name", metavar="target_name", type=str, help="Name of the target project"
+    )
+
+    parser.add_argument(
+        "-d",
+        "--dry",
+        action="store_true",
+        help="Run without actually modifying files.",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--config",
+        dest="config_file_path",
+        default=Path.cwd() / "template_config.yaml",
+        help="Config file to use. Default=\"./template_config.yaml\"",
+    )
+
+    args = parser.parse_args()
+
+    print(args.__dict__)
+
+    init_template(args.config_file_path, args.target_name, args.dry)
 
 
 if __name__ == "__main__":
