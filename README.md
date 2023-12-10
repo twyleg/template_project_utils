@@ -7,14 +7,21 @@
 
 # template_project_utils
 
-Ipsum Lorem
+Personal utilities to initialize various projects (eg. Python, C++, Kicad)
 
-## Prerequisites
+## Installation
 
-Add the following secrets for GitHub Actions:
+Install via pip:
 
-* PYPI_API_TOKEN
+    pip install template-project-utils
 
-## Examples
+## Usage
 
-All examples can be found in the [examples/](https://github.com/twyleg/template_project_utils/tree/master/examples) directory.
+Create a new project based on one of the following templates:
+
+* https://github.com/twyleg/template_project_kicad
+* https://github.com/twyleg/template_project_python
+
+Change into the new projects directory and run the following command
+
+    template_project_utils <NEW_PROEJCTS_NAME>

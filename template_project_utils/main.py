@@ -13,11 +13,10 @@ FILE_DIR = Path(__file__).parent
 
 
 def main() -> None:
-
-    logging.basicConfig(stream=sys.stdout, format=FORMAT, level=logging.INFO)
-    logging.info("template_project_utils started!")
-
     parser = argparse.ArgumentParser(usage="template_project_utils <command> [<args>] <files>")
+
+    parser.add_argument("target_name", metavar="target_name", type=str, help="Name of the target project")
+
     parser.add_argument(
         "-v",
         "--version",
@@ -27,7 +26,10 @@ def main() -> None:
     )
 
     parser.add_argument(
-        "target_name", metavar="target_name", type=str, help="Name of the target project"
+        "-vv",
+        "--verbose",
+        action="store_true",
+        help="Show verbose output on stdout.",
     )
 
     parser.add_argument(
@@ -42,12 +44,13 @@ def main() -> None:
         "--config",
         dest="config_file_path",
         default=Path.cwd() / "template_config.yaml",
-        help="Config file to use. Default=\"./template_config.yaml\"",
+        help='Config file to use. Default="./template_config.yaml"',
     )
 
     args = parser.parse_args()
 
-    print(args.__dict__)
+    logging.basicConfig(stream=sys.stdout, format=FORMAT, level=logging.DEBUG if args.verbose else logging.INFO)
+    logging.info("template_project_utils started!")
 
     init_template(args.config_file_path, args.target_name, args.dry)
 

@@ -23,7 +23,7 @@ def load_config(config_path: Path) -> dict:
 def replace_string_in_file(filepath: Path, text_to_search: str, replacement_text: str):
     with fileinput.FileInput(filepath, inplace=True) as file:
         for line in file:
-            print(line.replace(text_to_search, replacement_text), end='')
+            print(line.replace(text_to_search, replacement_text), end="")
 
 
 def update_files(placeholder: str, target: str, files: dict, dry_run=False) -> None:
@@ -145,4 +145,3 @@ def init_template(config_path: Path, target_name: str, dry_run=False):
     logging.info("Scan results for keywords '%s'", placeholder)
     logging.info("Occurrences before initialization: dirs=%d, files=%d", *prerun_scan_results)
     logging.info("Occurrences after initialization:  dirs=%d, files=%d", *postrun_scan_results)
-    

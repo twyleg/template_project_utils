@@ -1,3 +1,6 @@
 [submodule "external/template_project_python"]
 	path = external/template_project_python
 	url = git@github.com:twyleg/template_project_python.git
+[submodule "external/template_project_kicad"]
+	path = external/template_project_kicad
+	url = git@github.com:twyleg/template_project_kicad.git
