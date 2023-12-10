@@ -53,7 +53,7 @@ class KicadTemplateInitializeTestCase(TemplateInitializeTestCase):
     @classmethod
     def prepare_template_project_kicad(cls, dst_dir: Path) -> Path:
         dst_path = dst_dir / "template_project_kicad"
-        shutil.copytree(cls.TEMPLATE_PROJECT_KICAD_DIR, dst_path)
+        shutil.copytree(cls.TEMPLATE_PROJECT_KICAD_DIR, dst_path, symlinks=False)
         return dst_path
 
     def test_TemplateCreated_Initialize_Success(self):
