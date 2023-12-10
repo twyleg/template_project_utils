@@ -90,7 +90,7 @@ def scan_for_keywords(base_dir_path: Path, keywords: list) -> Tuple[int, int]:
     file_content_count = 0
 
     for path in base_dir_path.rglob("*"):
-        if path == base_dir_path / ".git":
+        if base_dir_path / ".git" in path:
             pass  # Ignore
         elif path.is_dir():
             for keyword in keywords:
