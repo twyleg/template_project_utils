@@ -4,3 +4,9 @@
 [submodule "external/template_project_kicad"]
 	path = external/template_project_kicad
 	url = git@github.com:twyleg/template_project_kicad.git
+[submodule "external/template_project_cpp"]
+	path = external/template_project_cpp
+	url = git@github.com:twyleg/template_project_cpp.git
+[submodule "external/template_project_cpp_qt_qml"]
+	path = external/template_project_cpp_qt_qml
+	url = git@github.com:twyleg/template_project_cpp.git
