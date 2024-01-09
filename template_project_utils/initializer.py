@@ -12,6 +12,8 @@ import json
 
 from pathlib import Path
 
+import template_project_utils.git as git
+
 FILE_DIR = Path(__file__).parent
 
 
@@ -147,3 +149,5 @@ def init_template(config_path: Path, target_name: str, dry_run=False):
     logging.info("Scan results for keywords '%s'", placeholder)
     logging.info("Occurrences before initialization: dirs=%d, files=%d", *prerun_scan_results)
     logging.info("Occurrences after initialization:  dirs=%d, files=%d", *postrun_scan_results)
+
+    git.remove_remote(config_path.parent, "origin")
