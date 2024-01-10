@@ -86,7 +86,6 @@ class TemplateInitializeTestCase(unittest.TestCase):
         self.expect_no_occurrences_of_keywords([self.template_project_name])
         self.expect_no_git_remote_origin()
 
-
     def setUp(self) -> None:
         logging.basicConfig(stream=sys.stdout, format=FORMAT, level=logging.DEBUG)
         self.output_dir_path = self.prepare_output_directory()
