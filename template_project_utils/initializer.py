@@ -39,27 +39,29 @@ def update_files(placeholder: str, target: str, files: dict, dry_run=False) -> N
                 replace_string_in_file(Path(file), placeholder, target)
 
 
-def rename_files(target: str, files: dict, dry_run=False) -> None:
+def rename_files(placeholder: str, target: str, files: dict, dry_run=False) -> None:
     logging.info("Renaming files:")
     if files is None:
         logging.info("  Nothing!")
     else:
         for rename_file in files:
             rename_file_path = Path(rename_file)
-            new_file_path = rename_file_path.parent / (target + rename_file_path.suffix)
+            new_file_name = rename_file_path.name.replace(placeholder, target)
+            new_file_path = rename_file_path.parent / new_file_name
             logging.info("  %s -> %s", rename_file_path, new_file_path)
             if not dry_run:
                 shutil.move(rename_file_path, new_file_path)
 
 
-def rename_dirs(target: str, dirs: dict, dry_run=False) -> None:
+def rename_dirs(placeholder: str, target: str, dirs: dict, dry_run=False) -> None:
     logging.info("Renaming dirs:")
     if dirs is None:
         logging.info("  Nothing!")
     else:
         for rename_dir in dirs:
             rename_dir_path = Path(rename_dir)
-            new_dir_path = rename_dir_path.parent / target
+            new_dir_name = rename_dir_path.name.replace(placeholder, target)
+            new_dir_path = rename_dir_path.parent / new_dir_name
             logging.info("  %s -> %s", rename_dir_path, new_dir_path)
             if not dry_run:
                 shutil.move(rename_dir_path, new_dir_path)
@@ -87,7 +89,8 @@ def remove_dirs(dirs: dict, dry_run=False) -> None:
                 shutil.rmtree(dir_path)
 
 
-def scan_for_keywords(base_dir_path: Path, keywords: list) -> Tuple[int, int]:
+def scan_for_keywords(base_dir_path: Path, keywords: list) -> Tuple[int, int, int]:
+    file_name_count = 0
     dir_name_count = 0
     file_content_count = 0
 
@@ -98,10 +101,17 @@ def scan_for_keywords(base_dir_path: Path, keywords: list) -> Tuple[int, int]:
             pass  # Ignore
         elif path.is_dir():
             for keyword in keywords:
-                if keyword in str(path.relative_to(base_dir_path)):
+                relative_path = path.relative_to(base_dir_path)
+                if keyword in relative_path.name:
                     dir_name_count += 1
                     logging.debug("Dir path containing keyword '%s': %s", keyword, path)
         elif path.is_file():
+            relative_path = path.relative_to(base_dir_path)
+            for keyword in keywords:
+                if keyword in relative_path.name:
+                    file_name_count += 1
+                    logging.debug("File path containing keyword '%s': %s", keyword, path)
+
             try:
                 content = path.read_text()
                 for keyword in keywords:
@@ -111,10 +121,10 @@ def scan_for_keywords(base_dir_path: Path, keywords: list) -> Tuple[int, int]:
                         logging.debug("File containing keyword '%s': %s", keyword, path)
             except UnicodeDecodeError as e:
                 pass
-    return dir_name_count, file_content_count
+    return file_name_count, dir_name_count, file_content_count
 
 
-def init_template(config_path: Path, target_name: str, dry_run=False):
+def init_template(config_path: Path, target_name: str, dry_run=False) -> Tuple[int, int, int]:
     config = load_config(config_path)
     logging.debug("Config: %s", config)
 
@@ -133,10 +143,10 @@ def init_template(config_path: Path, target_name: str, dry_run=False):
     update_files(placeholder, target_name, update_files_dict, dry_run)
 
     rename_files_dict = config["rename_files"]
-    rename_files(target_name, rename_files_dict, dry_run)
+    rename_files(placeholder, target_name, rename_files_dict, dry_run)
 
     rename_dirs_dict = config["rename_dirs"]
-    rename_dirs(target_name, rename_dirs_dict, dry_run)
+    rename_dirs(placeholder, target_name, rename_dirs_dict, dry_run)
 
     remove_files_dict = config["remove_files"]
     remove_files(remove_files_dict, dry_run)
@@ -147,7 +157,18 @@ def init_template(config_path: Path, target_name: str, dry_run=False):
     postrun_scan_results = scan_for_keywords(config_path.parent, [placeholder])
 
     logging.info("Scan results for keywords '%s'", placeholder)
-    logging.info("Occurrences before initialization: dirs=%d, files=%d", *prerun_scan_results)
-    logging.info("Occurrences after initialization:  dirs=%d, files=%d", *postrun_scan_results)
+
+    def log_results(results: Tuple[int, int, int]) -> None:
+        logging.info(" - File names      : %d", results[0])
+        logging.info(" - Directory names : %d", results[1])
+        logging.info(" - File contents   : %d", results[2])
+
+    logging.info("Occurrences before initialization:")
+    log_results(prerun_scan_results)
+
+    logging.info("Occurrences after initialization:")
+    log_results(postrun_scan_results)
 
     git.remove_remote(config_path.parent, "origin")
+
+    return postrun_scan_results

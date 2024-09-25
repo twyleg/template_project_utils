@@ -1,12 +1,15 @@
 [submodule "external/template_project_python"]
-	path = external/template_project_python
+	path = external/template_project_python_master
 	url = git@github.com:twyleg/template_project_python.git
 [submodule "external/template_project_kicad"]
-	path = external/template_project_kicad
+	path = external/template_project_kicad_master
 	url = git@github.com:twyleg/template_project_kicad.git
 [submodule "external/template_project_cpp"]
-	path = external/template_project_cpp
+	path = external/template_project_cpp_master
 	url = git@github.com:twyleg/template_project_cpp.git
-[submodule "external/template_project_cpp_qt_qml"]
-	path = external/template_project_cpp_qt_qml
+[submodule "external/template_project_python_usecase_qt_qml_app"]
+	path = external/template_project_python_usecase_qt_qml_app
+	url = git@github.com:twyleg/template_project_python.git
+[submodule "external/template_project_cpp_usecase_qt_qml_app"]
+	path = external/template_project_cpp_usecase_qt_qml_app
 	url = git@github.com:twyleg/template_project_cpp.git

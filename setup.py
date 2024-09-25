@@ -11,7 +11,7 @@ def read(relative_filepath):
 def read_long_description() -> str:
     return read("README.md")
 
-
+# fmt: off
 setup(
     name="template_project_utils",
     version=versioneer.get_version(),
@@ -26,7 +26,12 @@ setup(
     long_description=read_long_description(),
     long_description_content_type="text/markdown",
     include_package_data=True,
-    install_requires=["pyyaml~=6.0.1", "types-pyyaml~=6.0.12.12", "jsonschema~=4.20.0", "types_jsonschema~=4.20.0.0"],
+    install_requires=[
+        "pyyaml~=6.0.1",
+        "types-pyyaml~=6.0.12.12",
+        "jsonschema~=4.20.0",
+        "types_jsonschema~=4.20.0.0"
+    ],
     entry_points={
         "console_scripts": [
             "template_project_utils = template_project_utils.main:main",
