@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 def remove_remote(project_dir_path: Path, name: str) -> None:
-    repo = pygit2.Repository(project_dir_path)
-    remote_collection = pygit2.remote.RemoteCollection(repo)
+    repo = pygit2.Repository(str(project_dir_path))
+    remote_collection = pygit2.remotes.RemoteCollection(repo)
 
     logging.debug("Remotes:")
     for remote in repo.remotes:

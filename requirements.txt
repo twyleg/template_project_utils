@@ -22,4 +22,5 @@ pyyaml~=6.0.1
 types-pyyaml~=6.0.12.12
 jsonschema~=4.20.0
 types_jsonschema~=4.20.0.0
-pygit2~=1.13.3
+pygit2~=1.15.1
+types-pygit2~=1.15.0.20240822

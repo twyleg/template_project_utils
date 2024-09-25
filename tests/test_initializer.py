@@ -1,4 +1,5 @@
 # Copyright (C) 2024 twyleg
+# fmt: off
 import shutil
 import sys
 from typing import List
@@ -80,9 +81,9 @@ def template_project_python_usecase_qt_qml_app(tmp_path, monkeypatch):
 
 
 def is_git_remote_origin_still_available(test_project_path: Path) -> bool:
-    repo = pygit2.Repository(test_project_path)
-    remote_collection = pygit2.remote.RemoteCollection(repo)
-    return "origin" in remote_collection
+    repo = pygit2.Repository(str(test_project_path))
+    remote_collection = pygit2.remotes.RemoteCollection(repo)
+    return "origin" in remote_collection.names()
 
 
 def is_any_placeholder_still_available(test_project_path: Path, keywords: List[str]):

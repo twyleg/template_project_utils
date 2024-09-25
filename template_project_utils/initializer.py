@@ -86,7 +86,7 @@ def remove_dirs(dirs: dict, dry_run=False) -> None:
         for dir_path in dirs:
             logging.info("  %s", dir_path)
             if not dry_run:
-                shutil.rmtree(dir_path)
+                shutil.rmtree(dir_path, ignore_errors=True)
 
 
 def scan_for_keywords(base_dir_path: Path, keywords: list) -> Tuple[int, int, int]:
