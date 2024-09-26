@@ -52,9 +52,9 @@ def main() -> None:
     logging.basicConfig(stream=sys.stdout, format=FORMAT, level=logging.DEBUG if args.verbose else logging.INFO)
     logging.info("template_project_utils started!")
 
-    file_name_result, dir_name_result, file_content_result = init_template(args.config_file_path, args.target_name, args.dry)
+    scan_results = init_template(args.config_file_path, {}, args.dry)
 
-    if file_name_result or dir_name_result or file_content_result:
+    if not scan_results.empty():
         sys.exit(-1)
 
 

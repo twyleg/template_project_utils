@@ -2,8 +2,11 @@
   "type": ["object", "null"],
   "properties": {
     "placeholder": {
-      "type": "string",
-      "additionalProperties": false
+      "type": ["array"],
+      "items": {
+        "type": "string",
+        "additionalProperties": false
+      }
     },
     "update_files": {
       "type": ["array", "null"],
