@@ -22,4 +22,4 @@ def remove_remote(project_dir_path: Path, name: str) -> None:
         except KeyError as e:
             logging.warning("Unable to remove remote '%s' due to non-existence", name)
     except GitError:
-        logging.warning("Unable to find git repo in dir \"%s\"", project_dir_path)
+        logging.warning('Unable to find git repo in dir "%s"', project_dir_path)

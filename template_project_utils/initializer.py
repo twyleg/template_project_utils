@@ -60,7 +60,7 @@ def rename_files(placeholder_target_dict: Dict[str, str], files: List[str], dry_
     else:
         for rename_file in files:
             for placeholder, target in placeholder_target_dict.items():
-                logging.debug("  Placeholder: \"%s\", Target: \"%s\"", placeholder, target)
+                logging.debug('  Placeholder: "%s", Target: "%s"', placeholder, target)
                 if placeholder in rename_file:
                     rename_file_path = Path(rename_file)
                     new_file_name = rename_file_path.name.replace(placeholder, target)
@@ -77,7 +77,7 @@ def rename_dirs(placeholder_target_dict: Dict[str, str], dirs: List[str], dry_ru
     else:
         for rename_dir in dirs:
             for placeholder, target in placeholder_target_dict.items():
-                logging.debug("  Placeholder: \"%s\", Target: \"%s\"", placeholder, target)
+                logging.debug('  Placeholder: "%s", Target: "%s"', placeholder, target)
                 if placeholder in rename_dir:
                     rename_dir_path = Path(rename_dir)
                     new_dir_name = rename_dir_path.name.replace(placeholder, target)
@@ -147,12 +147,9 @@ def init_template(config_path: Path, placeholder_target_dict: Dict[str, str], dr
     def read_placeholder_target_dict_from_user_input() -> Dict[str, str]:
         user_input_placeholder_target_dict: Dict[str, str] = {}
         for ph in placeholder:
-            target = inquirer.text(
-                message=f"Target name for \"{ph}\":"
-            ).execute()
+            target = inquirer.text(message=f'Target name for "{ph}":').execute()
             user_input_placeholder_target_dict[ph] = target
         return user_input_placeholder_target_dict
-
 
     config = load_config(config_path)
     logging.debug("Config: %s", config)
