@@ -10,7 +10,8 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from pathlib import Path
 
-from template_project_utils.initializer import init_template
+from template_project_utils.template_initializer import TemplateInitializer
+
 
 FILE_DIR = Path(__file__).parent
 
@@ -96,6 +97,8 @@ def is_any_placeholder_still_available(test_project_path: Path, keywords: List[s
             pass  # Ignore
         elif path.is_relative_to(test_project_path / "venv/"):
             pass  # Ignore
+        elif path.is_relative_to(test_project_path / "logs/"):
+            pass  # Ignore
         elif path.is_dir():
             relative_path = str(path.relative_to(test_project_path))
             for keyword in keywords:
@@ -131,21 +134,32 @@ def is_project_correctly_initialized(test_project_path: Path, template_project_k
 
 class TestInitializer:
     def test_ValidTemplateProjectCppMaster_InitializeTemplate_InitializationSuccessful(self, template_project_cpp_master):
-        init_template(template_project_cpp_master / "template_config.yaml", "test_target_name")
+        template_initializer = TemplateInitializer(template_project_cpp_master / "template_config.yaml")
+        template_initializer.init({"template_project_cpp": "test_target_name"})
         assert is_project_correctly_initialized(template_project_cpp_master, ["template_project_cpp"])
 
     def test_ValidTemplateProjectCppUsecaseQtQmlApp_InitializeTemplate_InitializationSuccessful(self, template_project_cpp_usecase_qt_qml_app):
-        init_template(template_project_cpp_usecase_qt_qml_app / "template_config.yaml", "test_target_name")
+        template_initializer = TemplateInitializer(template_project_cpp_usecase_qt_qml_app / "template_config.yaml")
+        template_initializer.init({"template_project_cpp": "test_target_name"})
         assert is_project_correctly_initialized(template_project_cpp_usecase_qt_qml_app, ["template_project_cpp"])
 
     def test_ValidTemplateProjectKicadMaster_InitializeTemplate_InitializationSuccessful(self, template_project_kicad_master):
-        init_template(template_project_kicad_master / "template_config.yaml", "test_target_name")
+        template_initializer = TemplateInitializer(template_project_kicad_master / "template_config.yaml")
+        template_initializer.init({"template_project_kicad": "test_target_name"})
         assert is_project_correctly_initialized(template_project_kicad_master, ["template_project_kicad"])
 
     def test_ValidTemplateProjectPythonMaster_InitializeTemplate_InitializationSuccessful(self, template_project_python_master):
-        init_template(template_project_python_master / "template_config.yaml", "test_target_name")
+        template_initializer = TemplateInitializer(template_project_python_master / "template_config.yaml")
+        template_initializer.init({
+            "template_project_python": "test_target_name",
+            "template-project-python": "test-target-name",
+        })
         assert is_project_correctly_initialized(template_project_python_master, ["template_project_python"])
 
     def test_ValidTemplateProjectPythonUsecaseQtQmlApp_InitializeTemplate_InitializationSuccessful(self, template_project_python_usecase_qt_qml_app):
-        init_template(template_project_python_usecase_qt_qml_app / "template_config.yaml", "test_target_name")
+        template_initializer = TemplateInitializer(template_project_python_usecase_qt_qml_app / "template_config.yaml")
+        template_initializer.init({
+            "template_project_python": "test_target_name",
+            "template-project-python": "test-target-name",
+        })
         assert is_project_correctly_initialized(template_project_python_usecase_qt_qml_app, ["template_project_python"])

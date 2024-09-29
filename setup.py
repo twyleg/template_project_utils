@@ -28,10 +28,9 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     install_requires=[
-        "pyyaml~=6.0.1",
-        "types-pyyaml~=6.0.12.12",
-        "jsonschema~=4.20.0",
-        "types_jsonschema~=4.20.0.0"
+        "simple-python-app==0.3.0",
+        "pygit2~=1.15.1",
+        "inquirerpy~=0.3.4",
     ],
     entry_points={
         "console_scripts": [

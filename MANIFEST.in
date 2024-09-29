@@ -5,4 +5,5 @@ graft template_project_utils
 recursive-exclude * *.py[co]
 include versioneer.py
 include template_project_utils/_version.py
-include template_project_utils/schemas/*.json
+include template_project_utils/resources/schemas/*.json
+include template_project_utils/resources/configs/*.yaml

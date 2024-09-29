@@ -1,61 +1,96 @@
-# Copyright (C) 2023 twyleg
-import sys
+# Copyright (C) 2024 twyleg
 import argparse
-import logging
-
+import re
 from pathlib import Path
-from template_project_utils import __version__
-from template_project_utils.initializer import init_template
+from typing import Dict
 
-FORMAT = "[%(asctime)s][%(levelname)s][%(name)s]: %(message)s"
+from simple_python_app.generic_application import GenericApplication
+
+from template_project_utils import __version__
+from template_project_utils.keyword_scanner import KeywordScanner
+from template_project_utils.template_initializer import TemplateInitializer
+
 
 FILE_DIR = Path(__file__).parent
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(usage="template_project_utils <command> [<args>] <files>")
+class TemplateProjectUtils(GenericApplication):
 
-    parser.add_argument("target_name", metavar="target_name", type=str, help="Name of the target project")
+    def __init__(self):
+        # fmt: off
+        super().__init__(
+            application_name="template_project_utils",
+            version=__version__,
+            application_config_init_enabled=False,
+            logging_init_custom_logging_enabled=False,
+            logging_default_config_filepath=FILE_DIR / "resources/configs/default_logging_config.yaml",
+            logging_logfile_output_dir=Path.cwd() / "logs"
+        )
+        # fmt: on
 
-    parser.add_argument(
-        "-v",
-        "--version",
-        help="Show version and exit",
-        action="version",
-        version=__version__,
-    )
+    def add_arguments(self, argparser: argparse.ArgumentParser):
+        argparser.add_argument(
+            "-d",
+            "--dry",
+            action="store_true",
+            help="Run without actually modifying files.",
+        )
 
-    parser.add_argument(
-        "-vv",
-        "--verbose",
-        action="store_true",
-        help="Show verbose output on stdout.",
-    )
+        def regex_type(pattern: str | re.Pattern):
+            """Argument type for matching a regex pattern."""
 
-    parser.add_argument(
-        "-d",
-        "--dry",
-        action="store_true",
-        help="Run without actually modifying files.",
-    )
+            def closure_check_regex(arg_value):
+                if not re.match(pattern, arg_value):
+                    raise argparse.ArgumentTypeError("invalid value")
+                return arg_value
 
-    parser.add_argument(
-        "-c",
-        "--config",
-        dest="config_file_path",
-        default=Path.cwd() / "template_config.yaml",
-        help='Config file to use. Default="./template_config.yaml"',
-    )
+            return closure_check_regex
 
-    args = parser.parse_args()
+        argparser.add_argument(
+            "placeholder_target",
+            metavar="placeholder_target",
+            type=regex_type(r"^[^=]+=[^=]+$"),
+            nargs="*",
+            help="Placeholder target pair (placeholder=target).",
+        )
 
-    logging.basicConfig(stream=sys.stdout, format=FORMAT, level=logging.DEBUG if args.verbose else logging.INFO)
-    logging.info("template_project_utils started!")
+    def _get_placeholder_target_pairs_from_arguments(self, args: argparse.Namespace) -> Dict[str, str]:
+        placeholder_target_dict: Dict[str, str] = {}
+        for placeholder_target in args.placeholder_target:
+            placeholder, target = placeholder_target.split("=")
+            placeholder_target_dict[placeholder] = target
+        return placeholder_target_dict
 
-    file_name_result, dir_name_result, file_content_result = init_template(args.config_file_path, args.target_name, args.dry)
+    def run(self, args: argparse.Namespace) -> int:
+        config_file_path = Path(args.config) if args.config else Path.cwd() / "template_config.yaml"
+        template_initializer = TemplateInitializer(config_file_path, dry_run=args.dry)
 
-    if file_name_result or dir_name_result or file_content_result:
-        sys.exit(-1)
+        placeholder_keywords = list(template_initializer.placeholder_target_dict.keys())
+        placeholder_keyword_scanner = KeywordScanner(scan_base_dir_path=config_file_path.parent, keywords=placeholder_keywords)
+
+        placeholder_target_dict = self._get_placeholder_target_pairs_from_arguments(args)
+        self.logm.debug("Placeholder Target pairs from arguments: %s", placeholder_target_dict)
+
+        prerun_scan_results = placeholder_keyword_scanner.scan()
+        template_initializer.init(placeholder_target_dict)
+        postrun_scan_results = placeholder_keyword_scanner.scan()
+
+        self.logm.debug("Placeholder keyword pre init run:")
+        prerun_scan_results.log()
+        self.logm.debug("Placeholder keyword post init run:")
+        postrun_scan_results.log()
+
+        if postrun_scan_results.empty():
+            self.logm.info("Project initialized successfully!")
+            return 0
+        else:
+            self.logm.error("Project initialization failed!")
+            return -1
+
+
+def main():
+    template_project_utils = TemplateProjectUtils()
+    template_project_utils.start()
 
 
 if __name__ == "__main__":
