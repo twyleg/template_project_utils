@@ -16,7 +16,7 @@ cp -r $SCRIPT_DIR/../external/template_project_kicad_master/ $SCRIPT_DIR/data/ex
 
 
 cd $SCRIPT_DIR/data/example_project_python
-template_project_utils example_project_python
+template_project_utils template_project_python=example_project_python
 
 #cd $SCRIPT_DIR/data/example_project_kicad
 #template_project_utils -vv example_project_kicad

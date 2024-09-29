@@ -27,7 +27,7 @@ class TemplateInitializer:
         self.config = self._load_config(self.config_file_path)
         logm.debug("Config: %s", self.config)
 
-        with open(FILE_DIR / "schemas/config.json") as config_schema_file:
+        with open(FILE_DIR / "resources/schemas/config.json") as config_schema_file:
             config_schema = json.load(config_schema_file)
             jsonschema.validate(instance=self.config, schema=config_schema)
 
@@ -113,7 +113,7 @@ class TemplateInitializer:
                 if not self.dry_run:
                     shutil.rmtree(dir_to_remove, ignore_errors=True)
 
-    def init(self) -> None:
+    def init(self, placeholder_target_dict: Dict[str, str] = {}) -> None:
 
         def read_target_for_placeholder_from_user_input(placeholder: str) -> str:
             return inquirer.text(message=f'Target name for "{placeholder}":').execute()
@@ -122,10 +122,14 @@ class TemplateInitializer:
         os.chdir(self.working_dir_path)
 
         for placeholder, target in self.placeholder_target_dict.items():
-            if target is None:
-                self.placeholder_target_dict[placeholder] = read_target_for_placeholder_from_user_input(placeholder)
-
-        # prerun_scan_results = self.scan_for_keywords(config_path.parent, placeholder)
+            if placeholder in placeholder_target_dict:
+                target = placeholder_target_dict[placeholder]
+                self.placeholder_target_dict[placeholder] = target
+                logm.info("Target name from arguments for \"%s\": \"%s\"", placeholder, target)
+            else:
+                target = read_target_for_placeholder_from_user_input(placeholder)
+                self.placeholder_target_dict[placeholder] = target
+                logm.info("Target name from user input for \"%s\": \"%s\"", placeholder, target)
 
         self._update_files()
         self._rename_files()
