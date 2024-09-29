@@ -19,7 +19,7 @@ logm = logging.getLogger(__name__)
 
 class TemplateInitializer:
 
-    def __init__(self, config_file_path: Path, working_dir_path: Path | None = None, dry_run = False):
+    def __init__(self, config_file_path: Path, working_dir_path: Path | None = None, dry_run=False):
         self.config_file_path = config_file_path
         self.working_dir_path = working_dir_path if working_dir_path else config_file_path.parent
         self.dry_run = dry_run
@@ -37,7 +37,6 @@ class TemplateInitializer:
         self.dirs_to_rename: List[str] | None = self.config["rename_dirs"]
         self.files_to_remove: List[str] | None = self.config["remove_files"]
         self.dirs_to_remove: List[str] | None = self.config["remove_dirs"]
-
 
     @classmethod
     def _load_config(cls, config_path: Path) -> Dict[str, Any]:
@@ -59,6 +58,7 @@ class TemplateInitializer:
                 for placeholder, target in self.placeholder_target_dict.items():
                     logm.info("  %s: %s -> %s", file_to_update, placeholder, target)
                     if not self.dry_run:
+                        assert target
                         self.replace_string_in_file(Path(file_to_update), placeholder, target)
 
     def _rename_files(self) -> None:
@@ -70,6 +70,7 @@ class TemplateInitializer:
                 for placeholder, target in self.placeholder_target_dict.items():
                     logm.debug('  Placeholder: "%s", Target: "%s"', placeholder, target)
                     if placeholder in file_to_rename:
+                        assert target
                         rename_file_path = Path(file_to_rename)
                         new_file_name = rename_file_path.name.replace(placeholder, target)
                         new_file_path = rename_file_path.parent / new_file_name
@@ -86,6 +87,7 @@ class TemplateInitializer:
                 for placeholder, target in self.placeholder_target_dict.items():
                     logm.debug('  Placeholder: "%s", Target: "%s"', placeholder, target)
                     if placeholder in dir_to_rename:
+                        assert target
                         rename_dir_path = Path(dir_to_rename)
                         new_dir_name = rename_dir_path.name.replace(placeholder, target)
                         new_dir_path = rename_dir_path.parent / new_dir_name
@@ -125,11 +127,11 @@ class TemplateInitializer:
             if placeholder in placeholder_target_dict:
                 target = placeholder_target_dict[placeholder]
                 self.placeholder_target_dict[placeholder] = target
-                logm.info("Target name from arguments for \"%s\": \"%s\"", placeholder, target)
+                logm.info('Target name from arguments for "%s": "%s"', placeholder, target)
             else:
                 target = read_target_for_placeholder_from_user_input(placeholder)
                 self.placeholder_target_dict[placeholder] = target
-                logm.info("Target name from user input for \"%s\": \"%s\"", placeholder, target)
+                logm.info('Target name from user input for "%s": "%s"', placeholder, target)
 
         self._update_files()
         self._rename_files()

@@ -66,8 +66,7 @@ class TemplateProjectUtils(GenericApplication):
         template_initializer = TemplateInitializer(config_file_path, dry_run=args.dry)
 
         placeholder_keywords = list(template_initializer.placeholder_target_dict.keys())
-        placeholder_keyword_scanner = KeywordScanner(scan_base_dir_path=config_file_path.parent,
-                                                     keywords=placeholder_keywords)
+        placeholder_keyword_scanner = KeywordScanner(scan_base_dir_path=config_file_path.parent, keywords=placeholder_keywords)
 
         placeholder_target_dict = self._get_placeholder_target_pairs_from_arguments(args)
         self.logm.debug("Placeholder Target pairs from arguments: %s", placeholder_target_dict)
@@ -75,7 +74,6 @@ class TemplateProjectUtils(GenericApplication):
         prerun_scan_results = placeholder_keyword_scanner.scan()
         template_initializer.init(placeholder_target_dict)
         postrun_scan_results = placeholder_keyword_scanner.scan()
-
 
         self.logm.debug("Placeholder keyword pre init run:")
         prerun_scan_results.log()
