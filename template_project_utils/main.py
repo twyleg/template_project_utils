@@ -1,11 +1,14 @@
-# Copyright (C) 2023 twyleg
+# Copyright (C) 2024 twyleg
 import sys
 import argparse
 import logging
 
 from pathlib import Path
+
 from template_project_utils import __version__
-from template_project_utils.initializer import init_template
+
+from template_project_utils.keyword_scanner import KeywordScanner
+from template_project_utils.template_initializer import TemplateInitializer
 
 FORMAT = "[%(asctime)s][%(levelname)s][%(name)s]: %(message)s"
 
@@ -52,9 +55,22 @@ def main() -> None:
     logging.basicConfig(stream=sys.stdout, format=FORMAT, level=logging.DEBUG if args.verbose else logging.INFO)
     logging.info("template_project_utils started!")
 
-    scan_results = init_template(args.config_file_path, {}, args.dry)
+    config_file_path = Path(args.config_file_path)
+    template_initializer = TemplateInitializer(config_file_path, dry_run=args.dry)
 
-    if not scan_results.empty():
+    placeholder_keywords = list(template_initializer.placeholder_target_dict.keys())
+    placeholder_keyword_scanner = KeywordScanner(scan_base_dir_path=config_file_path.parent, keywords=placeholder_keywords)
+
+    prerun_scan_results = placeholder_keyword_scanner.scan()
+    template_initializer.init()
+    postrun_scan_results = placeholder_keyword_scanner.scan()
+
+    logging.getLogger().info("Placeholder keyword pre init run:")
+    prerun_scan_results.log()
+    logging.getLogger().info("Placeholder keyword post init run:")
+    postrun_scan_results.log()
+
+    if not postrun_scan_results.empty():
         sys.exit(-1)
 
 
