@@ -25,7 +25,7 @@ class TemplateInitializer:
         self.dry_run = dry_run
 
         self.config = self._load_config(self.config_file_path)
-        logging.debug("Config: %s", self.config)
+        logm.debug("Config: %s", self.config)
 
         with open(FILE_DIR / "schemas/config.json") as config_schema_file:
             config_schema = json.load(config_schema_file)
@@ -51,65 +51,65 @@ class TemplateInitializer:
                 line.replace(text_to_search, replacement_text)
 
     def _update_files(self) -> None:
-        logging.info("Updating files:")
+        logm.info("Updating files:")
         if self.files_to_update is None:
-            logging.info("  Nothing!")
+            logm.info("  Nothing!")
         else:
             for file_to_update in self.files_to_update:
                 for placeholder, target in self.placeholder_target_dict.items():
-                    logging.info("  %s: %s -> %s", file_to_update, placeholder, target)
+                    logm.info("  %s: %s -> %s", file_to_update, placeholder, target)
                     if not self.dry_run:
                         self.replace_string_in_file(Path(file_to_update), placeholder, target)
 
     def _rename_files(self) -> None:
-        logging.info("Renaming files:")
+        logm.info("Renaming files:")
         if self.files_to_rename is None:
-            logging.info("  Nothing!")
+            logm.info("  Nothing!")
         else:
             for file_to_rename in self.files_to_rename:
                 for placeholder, target in self.placeholder_target_dict.items():
-                    logging.debug('  Placeholder: "%s", Target: "%s"', placeholder, target)
+                    logm.debug('  Placeholder: "%s", Target: "%s"', placeholder, target)
                     if placeholder in file_to_rename:
                         rename_file_path = Path(file_to_rename)
                         new_file_name = rename_file_path.name.replace(placeholder, target)
                         new_file_path = rename_file_path.parent / new_file_name
-                        logging.info("  %s -> %s", rename_file_path, new_file_path)
+                        logm.info("  %s -> %s", rename_file_path, new_file_path)
                         if not self.dry_run:
                             shutil.move(rename_file_path, new_file_path)
 
     def _rename_dirs(self) -> None:
-        logging.info("Renaming dirs:")
+        logm.info("Renaming dirs:")
         if self.dirs_to_rename is None:
-            logging.info("  Nothing!")
+            logm.info("  Nothing!")
         else:
             for dir_to_rename in self.dirs_to_rename:
                 for placeholder, target in self.placeholder_target_dict.items():
-                    logging.debug('  Placeholder: "%s", Target: "%s"', placeholder, target)
+                    logm.debug('  Placeholder: "%s", Target: "%s"', placeholder, target)
                     if placeholder in dir_to_rename:
                         rename_dir_path = Path(dir_to_rename)
                         new_dir_name = rename_dir_path.name.replace(placeholder, target)
                         new_dir_path = rename_dir_path.parent / new_dir_name
-                        logging.info("  %s -> %s", rename_dir_path, new_dir_path)
+                        logm.info("  %s -> %s", rename_dir_path, new_dir_path)
                         if not self.dry_run:
                             shutil.move(rename_dir_path, new_dir_path)
 
     def _remove_files(self) -> None:
-        logging.info("Removing files:")
+        logm.info("Removing files:")
         if self.files_to_remove is None:
-            logging.info("  Nothing!")
+            logm.info("  Nothing!")
         else:
             for file_to_remove in self.files_to_remove:
-                logging.info("  %s", file_to_remove)
+                logm.info("  %s", file_to_remove)
                 if not self.dry_run:
                     os.remove(file_to_remove)
 
     def _remove_dirs(self) -> None:
-        logging.info("Removing dirs:")
+        logm.info("Removing dirs:")
         if self.dirs_to_remove is None:
-            logging.info("  Nothing!")
+            logm.info("  Nothing!")
         else:
             for dir_to_remove in self.dirs_to_remove:
-                logging.info("  %s", dir_to_remove)
+                logm.info("  %s", dir_to_remove)
                 if not self.dry_run:
                     shutil.rmtree(dir_to_remove, ignore_errors=True)
 
@@ -118,7 +118,7 @@ class TemplateInitializer:
         def read_target_for_placeholder_from_user_input(placeholder: str) -> str:
             return inquirer.text(message=f'Target name for "{placeholder}":').execute()
 
-        logging.info("Change directory: %s", self.working_dir_path)
+        logm.info("Change directory: %s", self.working_dir_path)
         os.chdir(self.working_dir_path)
 
         for placeholder, target in self.placeholder_target_dict.items():
@@ -134,28 +134,3 @@ class TemplateInitializer:
         self._remove_dirs()
 
         git.remove_remote(self.working_dir_path, "origin")
-
-        # postrun_scan_results = self.scan_for_keywords(config_path.parent, placeholder)
-
-        # logging.info("Scan results for keywords '%s'", placeholder)
-        #
-        # def log_results(scan_results: ScanResults) -> None:
-        #     logging.info(" - File names:")
-        #     for keyword, count in scan_results.file_name_count.items():
-        #         logging.info("     %s : %d", keyword, count)
-        #     logging.info(" - Directory names:")
-        #     for keyword, count in scan_results.dir_name_count.items():
-        #         logging.info("     %s : %d", keyword, count)
-        #     logging.info(" - File contents:")
-        #     for keyword, count in scan_results.file_content_count.items():
-        #         logging.info("     %s : %d", keyword, count)
-        #
-        # logging.info("Occurrences before initialization:")
-        # log_results(prerun_scan_results)
-        #
-        # logging.info("Occurrences after initialization:")
-        # log_results(postrun_scan_results)
-        #
-        #
-        #
-        # return postrun_scan_results

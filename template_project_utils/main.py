@@ -1,77 +1,67 @@
 # Copyright (C) 2024 twyleg
-import sys
 import argparse
-import logging
-
 from pathlib import Path
 
-from template_project_utils import __version__
+from simple_python_app.generic_application import GenericApplication
 
+from template_project_utils import __version__
 from template_project_utils.keyword_scanner import KeywordScanner
 from template_project_utils.template_initializer import TemplateInitializer
 
-FORMAT = "[%(asctime)s][%(levelname)s][%(name)s]: %(message)s"
 
 FILE_DIR = Path(__file__).parent
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(usage="template_project_utils <command> [<args>] <files>")
+class TemplateProjectUtils(GenericApplication):
 
-    parser.add_argument("target_name", metavar="target_name", type=str, help="Name of the target project")
+    def __init__(self):
+        # fmt: off
+        super().__init__(
+            application_name="template_project_utils",
+            version=__version__,
+            application_config_init_enabled=False,
+            logging_init_custom_logging_enabled=False,
+            logging_default_config_filepath=FILE_DIR / "resources/configs/default_logging_config.yaml",
+            logging_logfile_output_dir=Path.cwd() / "logs"
+        )
+        # fmt: on
 
-    parser.add_argument(
-        "-v",
-        "--version",
-        help="Show version and exit",
-        action="version",
-        version=__version__,
-    )
+    def add_arguments(self, argparser: argparse.ArgumentParser):
+        argparser.add_argument(
+            "-d",
+            "--dry",
+            action="store_true",
+            help="Run without actually modifying files.",
+        )
 
-    parser.add_argument(
-        "-vv",
-        "--verbose",
-        action="store_true",
-        help="Show verbose output on stdout.",
-    )
+    def run(self, args: argparse.Namespace) -> int:
+        config_file_path = Path(args.config) if args.config else Path.cwd() / "template_config.yaml"
+        template_initializer = TemplateInitializer(config_file_path, dry_run=args.dry)
 
-    parser.add_argument(
-        "-d",
-        "--dry",
-        action="store_true",
-        help="Run without actually modifying files.",
-    )
+        placeholder_keywords = list(template_initializer.placeholder_target_dict.keys())
+        placeholder_keyword_scanner = KeywordScanner(scan_base_dir_path=config_file_path.parent,
+                                                     keywords=placeholder_keywords)
 
-    parser.add_argument(
-        "-c",
-        "--config",
-        dest="config_file_path",
-        default=Path.cwd() / "template_config.yaml",
-        help='Config file to use. Default="./template_config.yaml"',
-    )
+        prerun_scan_results = placeholder_keyword_scanner.scan()
+        template_initializer.init()
+        postrun_scan_results = placeholder_keyword_scanner.scan()
 
-    args = parser.parse_args()
+        self.logm.debug("Placeholder keyword pre init run:")
+        prerun_scan_results.log()
+        self.logm.debug("Placeholder keyword post init run:")
+        postrun_scan_results.log()
 
-    logging.basicConfig(stream=sys.stdout, format=FORMAT, level=logging.DEBUG if args.verbose else logging.INFO)
-    logging.info("template_project_utils started!")
+        if postrun_scan_results.empty():
+            self.logm.info("Project initialized successfully!")
+            return 0
+        else:
+            self.logm.error("Project initialization failed!")
+            return -1
 
-    config_file_path = Path(args.config_file_path)
-    template_initializer = TemplateInitializer(config_file_path, dry_run=args.dry)
 
-    placeholder_keywords = list(template_initializer.placeholder_target_dict.keys())
-    placeholder_keyword_scanner = KeywordScanner(scan_base_dir_path=config_file_path.parent, keywords=placeholder_keywords)
-
-    prerun_scan_results = placeholder_keyword_scanner.scan()
-    template_initializer.init()
-    postrun_scan_results = placeholder_keyword_scanner.scan()
-
-    logging.getLogger().info("Placeholder keyword pre init run:")
-    prerun_scan_results.log()
-    logging.getLogger().info("Placeholder keyword post init run:")
-    postrun_scan_results.log()
-
-    if not postrun_scan_results.empty():
-        sys.exit(-1)
+def main():
+    template_project_utils = TemplateProjectUtils()
+    template_project_utils.start()
 
 
 if __name__ == "__main__":

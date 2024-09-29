@@ -22,18 +22,21 @@ class KeywordScanner:
             self.file_content_count: Dict[str, int] = self.create_empty_keyword_count_dict(keywords)
 
         def empty(self) -> bool:
-            return not (self.file_name_count or self.dir_name_count or self.file_content_count)
+            file_name_count = sum(list(self.file_name_count.values()))
+            dir_name_count = sum(list(self.dir_name_count.values()))
+            file_content_count = sum(list(self.file_content_count.values()))
+            return file_name_count == 0 and dir_name_count == 0 and file_content_count == 0
 
         def log(self) -> None:
-            logging.info(" - File names:")
+            logging.debug(" - File names:")
             for keyword, count in self.file_name_count.items():
-                logging.info("     %s : %d", keyword, count)
-            logging.info(" - Directory names:")
+                logging.debug("     %s : %d", keyword, count)
+            logging.debug(" - Directory names:")
             for keyword, count in self.dir_name_count.items():
-                logging.info("     %s : %d", keyword, count)
-            logging.info(" - File contents:")
+                logging.debug("     %s : %d", keyword, count)
+            logging.debug(" - File contents:")
             for keyword, count in self.file_content_count.items():
-                logging.info("     %s : %d", keyword, count)
+                logging.debug("     %s : %d", keyword, count)
 
     def __init__(self, scan_base_dir_path: Path, keywords: List[str]):
         self.scan_base_dir_path = scan_base_dir_path
@@ -46,6 +49,8 @@ class KeywordScanner:
             if path.is_relative_to(self.scan_base_dir_path / ".git/"):
                 pass  # Ignore
             elif path.is_relative_to(self.scan_base_dir_path / "venv/"):
+                pass  # Ignore
+            elif path.is_relative_to(self.scan_base_dir_path / "logs/"):
                 pass  # Ignore
             elif path.is_dir():
                 for keyword in self.keywords:
