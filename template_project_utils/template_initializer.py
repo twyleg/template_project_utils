@@ -19,10 +19,16 @@ logm = logging.getLogger(__name__)
 
 class TemplateInitializer:
 
-    def __init__(self, config_file_path: Path, working_dir_path: Path | None = None, dry_run=False):
-        self.config_file_path = config_file_path
-        self.working_dir_path = working_dir_path if working_dir_path else config_file_path.parent
+    def __init__(self, config_file_or_dir_path: Path, working_dir_path: Path | None = None, dry_run=False):
+        self.config_file_path = config_file_or_dir_path if not config_file_or_dir_path.is_dir() else config_file_or_dir_path / "template_config.yaml"
+        self.working_dir_path = working_dir_path if working_dir_path else self.config_file_path.parent
         self.dry_run = dry_run
+
+        if not self.config_file_path.exists():
+            raise RuntimeError(f"Config file does not exist: {self.config_file_path}")
+
+        if not self.working_dir_path.exists():
+            raise RuntimeError(f"Working dir does not exist: {self.working_dir_path}")
 
         self.config = self._load_config(self.config_file_path)
         logm.debug("Config: %s", self.config)
@@ -44,10 +50,10 @@ class TemplateInitializer:
             return yaml.safe_load(file)
 
     @classmethod
-    def replace_string_in_file(cls, filepath: Path, text_to_search: str, replacement_text: str):
+    def replace_string_in_file(cls, filepath: Path, text_to_search: str, replacement_text: str) -> None:
         with fileinput.FileInput(filepath, inplace=True) as file:
             for line in file:
-                line.replace(text_to_search, replacement_text)
+                print(line.replace(text_to_search, replacement_text), end="")
 
     def _update_files(self) -> None:
         logm.info("Updating files:")
